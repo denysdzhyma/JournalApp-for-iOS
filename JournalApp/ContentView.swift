@@ -20,6 +20,22 @@ struct Journal: Identifiable {
     var entries: [JournalEntry]
 }
 
+struct JournalDetailView: View {
+    let journal: Journal
+    
+    var body: some View {
+        List (journal.entries) { entry in
+            VStack(alignment: .leading) {
+                Text(entry.title)
+                    .font(.headline)
+                Text(entry.text)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        }.navigationTitle(journal.title)
+    }
+}
+
 struct ContentView: View {
     
     @State private var journals: [Journal] = [
