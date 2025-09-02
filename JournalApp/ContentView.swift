@@ -21,6 +21,7 @@ struct Journal: Identifiable {
 }
 
 struct JournalDetailView: View {
+    @State private var showingAddEntrySheet = false
     let journal: Journal
     
     var body: some View {
@@ -32,7 +33,47 @@ struct JournalDetailView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-        }.navigationTitle(journal.title)
+        }
+        .navigationTitle(journal.title)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    showingAddEntrySheet = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+        }
+        .sheet(isPresented: $showingAddEntrySheet) {
+            AddEntryView()
+        }
+    }
+}
+
+struct AddEntryView: View {
+    @Environment(\.dismiss) var dismiss
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Text("New Entry Form")
+                // We will add TextFields form soon
+            }
+            .navigationTitle("New Journal Form")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        // We will add save logic here
+                        dismiss() // dismiss the sheet temporarily.
+                    }
+                }
+            }
+        }
     }
 }
 
