@@ -21,9 +21,9 @@ struct Journal: Identifiable {
 }
 
 struct JournalDetailView: View {
+    @Binding var journal: Journal
     @State private var showingAddEntrySheet = false
-    let journal: Journal
-    
+
     var body: some View {
         List (journal.entries) { entry in
             VStack(alignment: .leading) {
@@ -45,19 +45,22 @@ struct JournalDetailView: View {
             }
         }
         .sheet(isPresented: $showingAddEntrySheet) {
-            AddEntryView()
+            AddEntryView(journal: $journal)
         }
     }
 }
 
 struct AddEntryView: View {
     @Environment(\.dismiss) var dismiss
+    @Binding var journal: Journal
+    @State private var newTitle = ""
+    @State private var newText = ""
     
     var body: some View {
         NavigationView {
             Form {
-                Text("New Entry Form")
-                // We will add TextFields form soon
+                TextField("Entry Title", text: $newTitle)
+                TextField("Entry Text", text: $newText, axis: .vertical)
             }
             .navigationTitle("New Journal Form")
             .toolbar {
@@ -68,9 +71,10 @@ struct AddEntryView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        // We will add save logic here
-                        dismiss() // dismiss the sheet temporarily.
-                    }
+                        let newEntry = JournalEntry(title: newTitle, text: newText, date: Date())
+                        journal.entries.append(newEntry)
+                        dismiss()
+                    }.disabled(newTitle.isEmpty)
                 }
             }
         }
@@ -91,9 +95,9 @@ struct ContentView: View {
     ]
     var body: some View {
         NavigationView {
-            List(journals) { journal in
+            List($journals) { $journal in
                 
-                NavigationLink(destination: JournalDetailView(journal: journal)) {
+                NavigationLink(destination: JournalDetailView(journal: $journal)) {
                     Text(journal.title)
                 }
             }.navigationTitle("My Journals")
